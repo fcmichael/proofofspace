@@ -35,24 +35,6 @@ public class FileGeneratorTest {
         Assert.assertEquals("70 MB", FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(file)));
     }
 
-    @Test
-    public void should_generate_same_hash_for_same_file() {
-        FileGenerator.ofSizeMBs(filePath, 3);
-        Assert.assertEquals(FileGenerator.getFileMd5Hash(filePath), FileGenerator.getFileMd5Hash(filePath));
-    }
-
-    @Test
-    public void should_likely_generate_different_hashes_of_different_files() {
-        FileGenerator.ofSizeMBs(filePath, 3);
-        FileGenerator.ofSizeMBs(filePath + "1", 3);
-
-        String hash = FileGenerator.getFileMd5Hash(filePath);
-        String hash1 = FileGenerator.getFileMd5Hash(filePath + "1");
-
-        Assert.assertNotEquals(hash, hash1);
-        FileUtils.deleteQuietly(new File(filePath + "1"));
-    }
-
     @After
     public void remove_created_file_if_exists() {
         FileUtils.deleteQuietly(new File(filePath));
