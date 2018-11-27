@@ -8,15 +8,15 @@ import java.time.ZoneId;
 
 @Getter
 @ToString
-class Block<T> {
+class Block {
 
     private int index;
     private String previousHash;
     private long timestamp;
-    private T data;
+    private String data;
     private String hash;
 
-    Block(int index, String previousHash, T data) {
+    Block(int index, String previousHash, String data) {
         this.index = index;
         this.previousHash = previousHash;
         this.timestamp = LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond();

@@ -9,17 +9,17 @@ import java.util.List;
 public class Blockchain<T> {
 
     @Getter
-    private List<Block<T>> blockchain;
+    private List<Block> blockchain;
 
     public Blockchain() {
         this.blockchain = new ArrayList<>();
-        Block<T> genesis = new Block<>(0, "0", null);
+        Block genesis = new Block(0, "0", null);
         blockchain.add(genesis);
     }
 
-    public void addBlock(T data) {
+    public void addBlock(String data) {
         String previousHash = blockchain.get(size() - 1).getHash();
-        Block<T> block = new Block<>(size(), previousHash, data);
+        Block block = new Block(size(), previousHash, data);
         blockchain.add(block);
     }
 

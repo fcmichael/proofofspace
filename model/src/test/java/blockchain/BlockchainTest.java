@@ -7,21 +7,9 @@ public class BlockchainTest {
 
     @Test
     public void should_create_correct_string_blockchain_containing_3_blocks() {
-        Blockchain<String> blockchain = new Blockchain<>();
+        Blockchain blockchain = new Blockchain();
         blockchain.addBlock("Second block data");
         blockchain.addBlock("Third block data");
-
-        blockchain.print();
-
-        Assert.assertEquals(3, blockchain.size());
-        Assert.assertTrue(blockchain.isValid());
-    }
-
-    @Test
-    public void should_create_correct_integer_blockchain_containing_3_blocks() {
-        Blockchain<Integer> blockchain = new Blockchain<>();
-        blockchain.addBlock(122);
-        blockchain.addBlock(555);
 
         blockchain.print();
 
