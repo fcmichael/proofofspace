@@ -13,15 +13,15 @@ class Block<T> {
     private int index;
     private String previousHash;
     private long timestamp;
-    private String hash;
     private T data;
+    private String hash;
 
     Block(int index, String previousHash, T data) {
         this.index = index;
         this.previousHash = previousHash;
         this.timestamp = LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond();
-        this.hash = calculateHash();
         this.data = data;
+        this.hash = calculateHash();
     }
 
     String calculateHash() {
