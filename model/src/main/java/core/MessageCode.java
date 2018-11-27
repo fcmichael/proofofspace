@@ -1,5 +1,7 @@
 package core;
 
 public enum MessageCode {
-    SEND_BLOCKCHAIN
+    PROVER_SENDING_NEW_BLOCK,
+    PROVER_REQUEST_FOR_CURRENT_BLOCKCHAIN,
+    UNKNOWN
 }

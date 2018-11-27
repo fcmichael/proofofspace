@@ -25,6 +25,10 @@ public class Blockchain {
         return true;
     }
 
+    public int size() {
+        return blockchain.size();
+    }
+
     public Block getBlockAtIndex(int index) {
         return blockchain.get(index);
     }
@@ -47,10 +51,6 @@ public class Blockchain {
         }
 
         return valid;
-    }
-
-    int size() {
-        return blockchain.size();
     }
 
     public void print() {

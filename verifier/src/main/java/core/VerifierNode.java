@@ -1,5 +1,6 @@
 package core;
 
+import blockchain.Block;
 import blockchain.Blockchain;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,7 +15,7 @@ public class VerifierNode {
 
     private static final int SERVER_SOCKET_PORT = 2222;
 
-    private static final Blockchain blockchain = new Blockchain<String>();
+    private static final Blockchain blockchain = new Blockchain();
 
     private static ServerSocket serverSocket;
     private static Map<Integer, Socket> provers;
@@ -24,7 +25,15 @@ public class VerifierNode {
         configureProverRequestsProcessor();
     }
 
-    static Blockchain getBlockchain(){
+    static void addToBlockchain(Block block) {
+        if (blockchain.addBlock(block)) {
+            System.out.println("Poprawnie dodano nowy blok do lancucha");
+        } else {
+            System.out.println("Niepoprawny blok, nie dodano");
+        }
+    }
+
+    static Blockchain getBlockchain() {
         return blockchain;
     }
 

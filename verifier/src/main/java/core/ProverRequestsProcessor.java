@@ -1,5 +1,6 @@
 package core;
 
+import blockchain.Block;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,11 +40,30 @@ class ProverRequestsProcessor extends Thread {
 
     private void processRequest(MessageCode messageCode) {
         switch (messageCode) {
-            case SEND_BLOCKCHAIN:
-                Gson gson = new Gson();
-                String blockchainJSON = gson.toJson(VerifierNode.getBlockchain());
-                out.println(blockchainJSON);
+            case PROVER_REQUEST_FOR_CURRENT_BLOCKCHAIN:
+                processSendingBlockchain();
                 break;
+            case PROVER_SENDING_NEW_BLOCK:
+                processReceivingNewBlock();
+                break;
+        }
+    }
+
+    private void processSendingBlockchain() {
+        Gson gson = new Gson();
+        String blockchainJSON = gson.toJson(VerifierNode.getBlockchain());
+        out.println(blockchainJSON);
+    }
+
+    private void processReceivingNewBlock() {
+        try {
+            String input = in.readLine();
+            Gson gson = new Gson();
+            Block block = gson.fromJson(input, Block.class);
+            log.info("Block received from node " + prover.getPort() + " : " + block);
+            VerifierNode.addToBlockchain(block);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
