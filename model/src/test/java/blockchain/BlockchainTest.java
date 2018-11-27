@@ -6,28 +6,40 @@ import org.junit.Test;
 public class BlockchainTest {
 
     @Test
-    public void should_create_correct_string_blockchain_containing_3_blocks() {
+    public void should_create_correct_blockchain_containing_3_blocks() {
         Blockchain blockchain = new Blockchain();
-        blockchain.addBlock("Second block data");
-        blockchain.addBlock("Third block data");
+        Block block1 = new Block(1, blockchain.getBlockAtIndex(0).getHash(), "prover1", "Second block data");
+        boolean result1 = blockchain.addBlock(block1);
+        Block block2 = new Block(2, blockchain.getBlockAtIndex(1).getHash(), "prover2", "Third block data");
+        boolean result2 = blockchain.addBlock(block2);
 
-        blockchain.print();
-
+        Assert.assertTrue(result1);
+        Assert.assertTrue(result2);
         Assert.assertEquals(3, blockchain.size());
+        Assert.assertEquals(block1, blockchain.getBlockAtIndex(1));
+        Assert.assertEquals(block2, blockchain.getBlockAtIndex(2));
         Assert.assertTrue(blockchain.isValid());
     }
 
     @Test
-    public void should_deny_blockchain_correctness_if_someone_removed_block() {
-        Blockchain<String> blockchain = new Blockchain<>();
-        blockchain.addBlock("Second block data");
-        blockchain.addBlock("Third block data");
-        blockchain.getBlockchain().remove(1);
+    public void should_not_add_block_with_invalid_hash_of_previous_block() {
+        Blockchain blockchain = new Blockchain();
+        Block block1 = new Block(1, "INVALID_HASH", "prover1", "Second block data");
+        boolean result1 = blockchain.addBlock(block1);
 
-        blockchain.print();
-
-        Assert.assertEquals(2, blockchain.size());
-        Assert.assertFalse(blockchain.isValid());
+        Assert.assertFalse(result1);
+        Assert.assertEquals(1, blockchain.size());
+        Assert.assertTrue(blockchain.isValid());
     }
 
+    @Test
+    public void should_not_add_block_with_invalid_index() {
+        Blockchain blockchain = new Blockchain();
+        Block block1 = new Block(999, blockchain.getBlockAtIndex(0).getHash(), "prover1", "Second block data");
+        boolean result1 = blockchain.addBlock(block1);
+
+        Assert.assertFalse(result1);
+        Assert.assertEquals(1, blockchain.size());
+        Assert.assertTrue(blockchain.isValid());
+    }
 }

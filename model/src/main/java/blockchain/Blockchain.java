@@ -1,29 +1,35 @@
 package blockchain;
 
 import com.google.gson.GsonBuilder;
-import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Blockchain<T> {
+public class Blockchain {
 
-    @Getter
     private List<Block> blockchain;
 
     public Blockchain() {
         this.blockchain = new ArrayList<>();
-        Block genesis = new Block(0, "0", null);
+        Block genesis = new Block(0, "0", null, null);
         blockchain.add(genesis);
     }
 
-    public void addBlock(String data) {
-        String previousHash = blockchain.get(size() - 1).getHash();
-        Block block = new Block(size(), previousHash, data);
+    public boolean addBlock(Block block) {
         blockchain.add(block);
+        if (!isValid()) {
+            System.out.println("Invalid block");
+            blockchain.remove(block);
+            return false;
+        }
+        return true;
     }
 
-    public boolean isValid() {
+    public Block getBlockAtIndex(int index) {
+        return blockchain.get(index);
+    }
+
+    boolean isValid() {
         boolean valid = true;
         Block previous;
         Block current;
@@ -34,7 +40,9 @@ public class Blockchain<T> {
             current = blockchain.get(i);
             previous = blockchain.get(i - 1);
 
-            valid = isBlockHashCalculatedProperly(current) && isPreviousBlockProperlyLinkedWithCurrentBlock(previous, current);
+            valid = isBlockHashCalculatedProperly(current) &&
+                    isPreviousBlockProperlyLinkedWithCurrentBlock(previous, current) &&
+                    isCorrectBlockIndex(i, current);
             i++;
         }
 
@@ -55,5 +63,9 @@ public class Blockchain<T> {
 
     private boolean isPreviousBlockProperlyLinkedWithCurrentBlock(Block previous, Block current) {
         return previous.getHash().equals(current.getPreviousHash());
+    }
+
+    private boolean isCorrectBlockIndex(int index, Block block) {
+        return index == block.getIndex();
     }
 }
