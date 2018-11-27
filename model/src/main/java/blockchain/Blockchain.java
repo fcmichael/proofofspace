@@ -1,34 +1,29 @@
 package blockchain;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class Blockchain<T> {
+public class Blockchain<T> {
 
     @Getter
     private List<Block<T>> blockchain;
 
-    private Gson gsonBuilder;
-
-    Blockchain() {
+    public Blockchain() {
         this.blockchain = new ArrayList<>();
         Block<T> genesis = new Block<>(0, "0", null);
         blockchain.add(genesis);
-
-        this.gsonBuilder = new GsonBuilder().setPrettyPrinting().create();
     }
 
-    void addBlock(T data) {
+    public void addBlock(T data) {
         String previousHash = blockchain.get(size() - 1).getHash();
         Block<T> block = new Block<>(size(), previousHash, data);
         blockchain.add(block);
     }
 
-    boolean isValid() {
+    public boolean isValid() {
         boolean valid = true;
         Block previous;
         Block current;
@@ -50,8 +45,8 @@ class Blockchain<T> {
         return blockchain.size();
     }
 
-    void print() {
-        System.out.println(gsonBuilder.toJson(blockchain));
+    public void print() {
+        System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(blockchain));
     }
 
     private boolean isBlockHashCalculatedProperly(Block block) {

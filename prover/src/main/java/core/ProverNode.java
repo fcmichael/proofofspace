@@ -1,5 +1,7 @@
 package core;
 
+import blockchain.Blockchain;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -18,8 +20,18 @@ public class ProverNode {
     private static PrintWriter out;
     private static BufferedReader in;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         startConnectionWithVerifierNode();
+
+        out.println(MessageCode.SEND_BLOCKCHAIN.name());
+
+        String input = in.readLine();
+        Gson gson = new Gson();
+
+        Blockchain blockchain = gson.fromJson(input, Blockchain.class);
+
+        blockchain.print();
+
         stopConnectionWithVerifierNode();
     }
 

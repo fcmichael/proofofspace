@@ -11,5 +11,12 @@
 
     <artifactId>verifier</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>pl.michalkruk.wat</groupId>
+            <artifactId>model</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
 </project>

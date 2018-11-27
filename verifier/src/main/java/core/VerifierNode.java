@@ -1,5 +1,6 @@
 package core;
 
+import blockchain.Blockchain;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -13,12 +14,18 @@ public class VerifierNode {
 
     private static final int SERVER_SOCKET_PORT = 2222;
 
+    private static final Blockchain blockchain = new Blockchain<String>();
+
     private static ServerSocket serverSocket;
     private static Map<Integer, Socket> provers;
 
     public static void main(String[] args) {
         init();
         configureProverRequestsProcessor();
+    }
+
+    static Blockchain getBlockchain(){
+        return blockchain;
     }
 
     private static void init() {
