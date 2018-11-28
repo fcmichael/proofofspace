@@ -9,6 +9,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class VerifierNode {
@@ -17,11 +21,14 @@ public class VerifierNode {
 
     private static final Blockchain blockchain = new Blockchain();
 
+    private static ScheduledExecutorService executorService;
+
     private static ServerSocket serverSocket;
-    private static Map<Integer, Socket> provers;
+    private static Map<Integer, ProverNodeInformation> proversTakingPartInBlockCreation;
 
     public static void main(String[] args) {
         init();
+        scheduleChoosingWinningBlock();
         configureProverRequestsProcessor();
     }
 
@@ -37,10 +44,18 @@ public class VerifierNode {
         return blockchain;
     }
 
+    static HashMap<Integer, ProverNodeInformation> getCurrentBlockchainParticipants() {
+        return new HashMap<>(proversTakingPartInBlockCreation);
+    }
+
+    static void addProverToBlockchainParticipants(int port, ProverNodeInformation proverNodeInformation) {
+        proversTakingPartInBlockCreation.put(port, proverNodeInformation);
+    }
+
     private static void init() {
         try {
             serverSocket = new ServerSocket(SERVER_SOCKET_PORT);
-            provers = new HashMap<>();
+            proversTakingPartInBlockCreation = new ConcurrentHashMap<>();
         } catch (IOException e) {
             log.error("Error while initializing server socket");
             log.error(e.getMessage());
@@ -50,11 +65,15 @@ public class VerifierNode {
     private static void configureProverRequestsProcessor() {
         try {
             Socket prover = serverSocket.accept();
-            provers.put(prover.getPort(), prover);
             new ProverRequestsProcessor(prover).start();
         } catch (IOException e) {
             log.error("Error while accepting client request");
             log.error(e.getMessage());
         }
+    }
+
+    private static void scheduleChoosingWinningBlock() {
+        executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(new WinningBlockChooser(), 10, 10, TimeUnit.SECONDS);
     }
 }

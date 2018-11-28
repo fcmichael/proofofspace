@@ -3,6 +3,7 @@ package core;
 import blockchain.Block;
 import blockchain.Blockchain;
 import file.FileGenerator;
+import file.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -10,6 +11,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.net.Socket;
 import java.time.LocalDateTime;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 class ProverRequestsProcessor extends Thread {
@@ -56,16 +58,21 @@ class ProverRequestsProcessor extends Thread {
 
     private void processReceivingNewBlock() {
         try {
-            generateAndSendFileOfSpecificSize(Integer.valueOf(in.readLine()));
-            addBlockToBlockchain(in.readLine());
+            int fileSize = Integer.valueOf(in.readLine());
+            File generatedFile = generateAndSendFileOfSpecificSize(fileSize);
+            String fileHash = FileService.getFileMd5Hash(generatedFile);
+            Block block = Block.fromJSON(in.readLine());
+            long randomLineNumber = generateRandomFileLine(FileService.countFileLines(generatedFile.getPath()));
+            String fileLine = FileService.getSpecificFileLine(generatedFile.getPath(), randomLineNumber);
+            VerifierNode.addProverToBlockchainParticipants(prover.getPort(), new ProverNodeInformation(prover, fileHash, randomLineNumber, fileLine, fileSize, block));
+            sendFileToProver(generatedFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void generateAndSendFileOfSpecificSize(int fileSize) {
-        File file = generateFileForProofOfSpace(buildPathToStoreFile(), fileSize);
-        sendFileToProver(file);
+    private File generateAndSendFileOfSpecificSize(int fileSize) {
+        return generateFileForProofOfSpace(buildPathToStoreFile(), fileSize);
     }
 
     private void sendFileToProver(File file) {
@@ -85,14 +92,12 @@ class ProverRequestsProcessor extends Thread {
         return FileGenerator.ofSizeMBs(path, fileSize);
     }
 
-    private String buildPathToStoreFile() {
-        return "/tmp/" + prover.getPort() + LocalDateTime.now() + ".txt";
+    private long generateRandomFileLine(long maxSize) {
+        return ThreadLocalRandom.current().nextLong(1, maxSize);
     }
 
-    private void addBlockToBlockchain(String blockJSON) {
-        Block block = Block.fromJSON(blockJSON);
-        log.info("Block received from node " + prover.getPort() + " : " + block);
-        VerifierNode.addToBlockchain(block);
+    private String buildPathToStoreFile() {
+        return "/tmp/" + prover.getPort() + LocalDateTime.now() + ".txt";
     }
 
     private void stopConnection() {
