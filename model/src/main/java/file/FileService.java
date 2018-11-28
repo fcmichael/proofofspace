@@ -21,7 +21,7 @@ public class FileService {
         return md5;
     }
 
-    static String getSpecificFileLine(String path, int lineNumber) {
+    public static String getSpecificFileLine(String path, int lineNumber) {
         String line = "";
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             for (int i = 1; i < lineNumber; i++) br.readLine();
@@ -30,5 +30,13 @@ public class FileService {
             log.error(e.getMessage());
         }
         return line;
+    }
+
+    static String humanReadableByteCount(long bytes, boolean si) {
+        int unit = si ? 1000 : 1024;
+        if (bytes < unit) return bytes + " B";
+        int exp = (int) (Math.log(bytes) / Math.log(unit));
+        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
+        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
 }

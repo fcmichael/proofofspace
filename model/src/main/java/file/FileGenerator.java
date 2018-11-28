@@ -12,15 +12,15 @@ import java.io.IOException;
 public class FileGenerator {
 
     public static File ofSizeMBs(String path, int sizeMBs) {
-
         File file = new File(path);
-
         try {
+            FileUtils.touch(file);
             FileWriter writer = new FileWriter(file);
-            long size = sizeMBs * 1024 * 1024;
+            long size = sizeMBs * 1000 * 1000;
 
             while (FileUtils.sizeOf(file) < size) {
-                writer.write(generateRandomStringOfSize(1024));
+                writer.write(generateRandomStringOfSize(99));
+                writer.write("\n");
             }
 
             writer.close();

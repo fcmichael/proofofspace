@@ -2,14 +2,12 @@ package core;
 
 import blockchain.Block;
 import blockchain.Blockchain;
-import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 import static core.ConsoleCode.FINISH;
@@ -47,9 +45,7 @@ public class ProverNode {
     private static void downloadCurrentBlockchain() {
         try {
             out.println(MessageCode.PROVER_REQUEST_FOR_CURRENT_BLOCKCHAIN.name());
-            String input = in.readLine();
-            Gson gson = new Gson();
-            blockchain = gson.fromJson(input, Blockchain.class);
+            blockchain = Blockchain.fromJSON(in.readLine());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -78,12 +74,46 @@ public class ProverNode {
     private static void processAddingNewBlock(Scanner scanner) {
         System.out.println("Podaj ciag znakow, ktory zostanie dodany do lancucha:");
         String blockData = scanner.next();
-        Block block = new Block(blockchain.size(),
-                blockchain.getBlockAtIndex(blockchain.size() - 1).getHash(),
-                String.valueOf(socket.getLocalPort()), blockData);
+        System.out.println("Podaj rozmiar pliku na potrzeby realizacji konsensusu Proof of Space [MB]:");
+        int fileSize = scanner.nextInt();
+
+        Block block = createBlock(blockData);
 
         out.println(MessageCode.PROVER_SENDING_NEW_BLOCK.name());
-        out.println(new Gson().toJson(block));
+        out.println(fileSize);
+        out.println(Block.toJSON(block));
+
+        receiveAndStoreFileForProofOfSpace();
+    }
+
+    private static Block createBlock(String data) {
+        return new Block(blockchain.size(),
+                blockchain.getBlockAtIndex(blockchain.size() - 1).getHash(),
+                String.valueOf(socket.getLocalPort()), data);
+    }
+
+    private static String buildFilePath() {
+        return "files/" + socket.getPort() + LocalDateTime.now() + ".txt";
+    }
+
+    private static void receiveAndStoreFileForProofOfSpace() {
+        File file = new File(buildFilePath());
+
+        try {
+            FileUtils.touch(file);
+            FileWriter fw = new FileWriter(file);
+
+            String line;
+            while ((line = in.readLine()) != null && !MessageCode.END_OF_FILE.name().equals(line)) {
+                fw.write(line);
+                fw.write("\n");
+            }
+
+            fw.close();
+            System.out.println("zapisano plik");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void printMenu() {

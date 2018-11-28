@@ -1,5 +1,6 @@
 package blockchain;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
@@ -51,6 +52,14 @@ public class Blockchain {
         }
 
         return valid;
+    }
+
+    public static String toJSON(Blockchain blockchain) {
+        return new Gson().toJson(blockchain);
+    }
+
+    public static Blockchain fromJSON(String json) {
+        return new Gson().fromJson(json, Blockchain.class);
     }
 
     public void print() {

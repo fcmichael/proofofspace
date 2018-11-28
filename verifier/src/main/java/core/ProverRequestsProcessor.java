@@ -1,14 +1,15 @@
 package core;
 
 import blockchain.Block;
-import com.google.gson.Gson;
+import blockchain.Blockchain;
+import file.FileGenerator;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.time.LocalDateTime;
 
 @Slf4j
 class ProverRequestsProcessor extends Thread {
@@ -50,21 +51,48 @@ class ProverRequestsProcessor extends Thread {
     }
 
     private void processSendingBlockchain() {
-        Gson gson = new Gson();
-        String blockchainJSON = gson.toJson(VerifierNode.getBlockchain());
-        out.println(blockchainJSON);
+        out.println(Blockchain.toJSON(VerifierNode.getBlockchain()));
     }
 
     private void processReceivingNewBlock() {
         try {
-            String input = in.readLine();
-            Gson gson = new Gson();
-            Block block = gson.fromJson(input, Block.class);
-            log.info("Block received from node " + prover.getPort() + " : " + block);
-            VerifierNode.addToBlockchain(block);
+            generateAndSendFileOfSpecificSize(Integer.valueOf(in.readLine()));
+            addBlockToBlockchain(in.readLine());
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void generateAndSendFileOfSpecificSize(int fileSize) {
+        File file = generateFileForProofOfSpace(buildPathToStoreFile(), fileSize);
+        sendFileToProver(file);
+    }
+
+    private void sendFileToProver(File file) {
+        try {
+            FileReader fr = new FileReader(file);
+            IOUtils.copy(fr, out);
+            fr.close();
+            out.println(MessageCode.END_OF_FILE);
+            FileUtils.deleteQuietly(file);
+            System.out.println("Wyslano plik");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private File generateFileForProofOfSpace(String path, int fileSize) {
+        return FileGenerator.ofSizeMBs(path, fileSize);
+    }
+
+    private String buildPathToStoreFile() {
+        return "/tmp/" + prover.getPort() + LocalDateTime.now() + ".txt";
+    }
+
+    private void addBlockToBlockchain(String blockJSON) {
+        Block block = Block.fromJSON(blockJSON);
+        log.info("Block received from node " + prover.getPort() + " : " + block);
+        VerifierNode.addToBlockchain(block);
     }
 
     private void stopConnection() {

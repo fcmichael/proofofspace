@@ -1,13 +1,12 @@
 package blockchain;
 
+import com.google.gson.Gson;
 import lombok.Getter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @Getter
-@ToString
 public class Block {
 
     private int index;
@@ -24,6 +23,14 @@ public class Block {
         this.prover = prover;
         this.data = data;
         this.hash = calculateHash();
+    }
+
+    public static String toJSON(Block block) {
+        return new Gson().toJson(block);
+    }
+
+    public static Block fromJSON(String json) {
+        return new Gson().fromJson(json, Block.class);
     }
 
     String calculateHash() {
