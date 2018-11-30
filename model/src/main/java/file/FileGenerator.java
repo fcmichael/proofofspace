@@ -25,7 +25,7 @@ public class FileGenerator {
 
             writer.close();
         } catch (IOException e) {
-            log.error("Error while generating random file of size = " + sizeMBs + " MBs");
+            log.error("Błąd podczas generowania pliku o rozmiarze = " + sizeMBs + " MBs");
             log.error(e.getMessage());
         }
 

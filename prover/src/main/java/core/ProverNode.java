@@ -63,6 +63,7 @@ public class ProverNode {
                         blockchain.print();
                         break;
                     case ADD_NEW_BLOCK:
+                        downloadCurrentBlockchain();
                         processAddingNewBlock(scanner);
                         break;
                 }

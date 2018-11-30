@@ -9,22 +9,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @Slf4j
 public class VerifierNode {
 
     private static final int SERVER_SOCKET_PORT = 2222;
-
     private static final Blockchain blockchain = new Blockchain();
-
-    private static ScheduledExecutorService executorService;
-
     private static ServerSocket serverSocket;
     private static Map<Integer, ProverNodeInformation> proversTakingPartInBlockCreation;
+    private static final int CHOOSING_WINNING_BLOCK_PERIOD_SECONDS = 10;
 
     public static void main(String[] args) {
         init();
@@ -52,6 +46,10 @@ public class VerifierNode {
         proversTakingPartInBlockCreation.put(port, proverNodeInformation);
     }
 
+    static void clearBlockchainParticipants() {
+        proversTakingPartInBlockCreation.clear();
+    }
+
     private static void init() {
         try {
             serverSocket = new ServerSocket(SERVER_SOCKET_PORT);
@@ -64,8 +62,10 @@ public class VerifierNode {
 
     private static void configureProverRequestsProcessor() {
         try {
-            Socket prover = serverSocket.accept();
-            new ProverRequestsProcessor(prover).start();
+            while (true) {
+                Socket prover = serverSocket.accept();
+                new ProverRequestsProcessor(prover).start();
+            }
         } catch (IOException e) {
             log.error("Error while accepting client request");
             log.error(e.getMessage());
@@ -73,7 +73,8 @@ public class VerifierNode {
     }
 
     private static void scheduleChoosingWinningBlock() {
-        executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleAtFixedRate(new WinningBlockChooser(), 10, 10, TimeUnit.SECONDS);
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(
+                new WinningBlockChooser(), CHOOSING_WINNING_BLOCK_PERIOD_SECONDS, CHOOSING_WINNING_BLOCK_PERIOD_SECONDS, TimeUnit.SECONDS);
     }
 }

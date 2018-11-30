@@ -19,7 +19,6 @@ public class Blockchain {
     public boolean addBlock(Block block) {
         blockchain.add(block);
         if (!isValid()) {
-            System.out.println("Invalid block");
             blockchain.remove(block);
             return false;
         }
@@ -67,14 +66,37 @@ public class Blockchain {
     }
 
     private boolean isBlockHashCalculatedProperly(Block block) {
-        return block.getHash().equals(block.calculateHash());
+        String currentHash = block.getHash();
+        String calculatedHash = block.calculateHash();
+        boolean valid = currentHash.equals(calculatedHash);
+
+        if (!valid) {
+            System.out.println("Nieprawidłowy hash bloku, jest: " + block.getHash() + ", powinien być: " + calculatedHash);
+        }
+
+        return valid;
     }
 
     private boolean isPreviousBlockProperlyLinkedWithCurrentBlock(Block previous, Block current) {
-        return previous.getHash().equals(current.getPreviousHash());
+        String previousBlockHash = previous.getHash();
+        String currentBlockPreviousHash = current.getPreviousHash();
+        boolean valid = previousBlockHash.equals(currentBlockPreviousHash);
+
+        if (!valid) {
+            System.out.println("Nieprawidłowy hash poprzedniego bloku, jest: "
+                    + currentBlockPreviousHash + ", powinien być: " + previousBlockHash);
+        }
+
+        return valid;
     }
 
     private boolean isCorrectBlockIndex(int index, Block block) {
-        return index == block.getIndex();
+        boolean valid = index == block.getIndex();
+
+        if (!valid) {
+            System.out.println("Nieprawidłowy indeks bloku, jest: " + block.getIndex() + ", powinien być: " + index);
+        }
+
+        return valid;
     }
 }

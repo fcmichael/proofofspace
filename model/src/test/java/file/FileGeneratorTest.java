@@ -20,19 +20,19 @@ public class FileGeneratorTest {
     @Test
     public void should_generate_random_file_of_3MBs_size() {
         File file = FileGenerator.ofSizeMBs(filePath, 3);
-        Assert.assertEquals("3.0 MB", FileService.humanReadableByteCount(FileUtils.sizeOf(file), true));
+        Assert.assertEquals("3 MB", FileService.humanReadableByteCount(FileUtils.sizeOf(file), true));
     }
 
     @Test
     public void should_generate_random_file_of_5MBs_size() {
         File file = FileGenerator.ofSizeMBs(filePath, 5);
-        Assert.assertEquals("5.0 MB", FileService.humanReadableByteCount(FileUtils.sizeOf(file), true));
+        Assert.assertEquals("5 MB", FileService.humanReadableByteCount(FileUtils.sizeOf(file), true));
     }
 
     @Test
     public void should_generate_random_file_of_70MBs_size() {
         File file = FileGenerator.ofSizeMBs(filePath, 70);
-        Assert.assertEquals("70.0 MB", FileService.humanReadableByteCount(FileUtils.sizeOf(file), true));
+        Assert.assertEquals("70 MB", FileService.humanReadableByteCount(FileUtils.sizeOf(file), true));
     }
 
     @After
