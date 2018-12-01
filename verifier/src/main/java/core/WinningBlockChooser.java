@@ -1,8 +1,10 @@
 package core;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class WinningBlockChooser extends Thread {
@@ -12,17 +14,12 @@ public class WinningBlockChooser extends Thread {
         try {
             Map<Integer, ProverNodeInformation> copy = VerifierNode.getCurrentBlockchainParticipants();
 
-            System.out.println("Losowanie o " + LocalDateTime.now().toString());
+            System.out.println("Losowanie o " + LocalTime.now().withNano(0).toString());
             if (copy.size() > 0) {
-                System.out.println("Wybieranie node'a");
+                System.out.println("Wybieranie zwycięskiego węzła spośród kandydatów: ");
+                printNodesChances(copy);
 
-                System.out.println("Propozycje: ");
-                copy.forEach((integer, proverNodeInformation) -> {
-                    System.out.println("Port " + integer + ", hash pliku: " + proverNodeInformation.getFileHash());
-                });
-
-                ArrayList<Integer> keys = new ArrayList<>(copy.keySet());
-                Integer winningPort = keys.get(0);
+                int winningPort = drawWinningTicket(createDrawingPool(copy));
                 System.out.println("Zwycieski port: " + winningPort);
 
                 VerifierNode.addToBlockchain(copy.get(winningPort).getProposedBlock());
@@ -46,7 +43,26 @@ public class WinningBlockChooser extends Thread {
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getFileSizeMbs() / mbsSum));
     }
 
-    void printNodesChances(Map<Integer, ProverNodeInformation> participants) {
+    List<Integer> createDrawingPool(Map<Integer, ProverNodeInformation> participants) {
+        List<Integer> drawingPool = new ArrayList<>();
 
+        participants.forEach((port, info) -> {
+            int ticketCount = info.getFileSizeMbs();
+            for (int i = 0; i < ticketCount; i++) {
+                drawingPool.add(port);
+            }
+        });
+
+        return drawingPool;
+    }
+
+    private int drawWinningTicket(List<Integer> drawingPool) {
+        int winningIndex = ThreadLocalRandom.current().nextInt(drawingPool.size());
+        return drawingPool.get(winningIndex);
+    }
+
+    private void printNodesChances(Map<Integer, ProverNodeInformation> participants) {
+        Map<Integer, Double> chances = calculateProversChancesToAddABlock(participants);
+        chances.forEach((port, chance) -> System.out.println(port + " -> " + String.format("%.2f", chance)));
     }
 }

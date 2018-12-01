@@ -36,6 +36,7 @@ public class ProverNode {
             socket = new Socket(VERIFIER_NODE_HOST, VERIFIER_NODE_PORT);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            System.out.println("Zainicjalizowano węzeł dowodzący na porcie: " + socket.getLocalPort());
         } catch (Exception e) {
             log.error("Error while initializing prover node and connection with verifier node");
             log.error(e.getMessage());

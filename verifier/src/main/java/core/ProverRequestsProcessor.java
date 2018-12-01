@@ -59,7 +59,7 @@ class ProverRequestsProcessor extends Thread {
     private void processReceivingNewBlock() {
         try {
             int fileSize = Integer.valueOf(in.readLine());
-            File generatedFile = generateAndSendFileOfSpecificSize(fileSize);
+            File generatedFile = generateFileOfSpecificSize(fileSize);
             String fileHash = FileService.getFileMd5Hash(generatedFile);
             Block block = Block.fromJSON(in.readLine());
             long randomLineNumber = generateRandomFileLine(FileService.countFileLines(generatedFile.getPath()));
@@ -71,7 +71,7 @@ class ProverRequestsProcessor extends Thread {
         }
     }
 
-    private File generateAndSendFileOfSpecificSize(int fileSize) {
+    private File generateFileOfSpecificSize(int fileSize) {
         return generateFileForProofOfSpace(buildPathToStoreFile(), fileSize);
     }
 

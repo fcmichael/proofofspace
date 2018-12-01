@@ -21,6 +21,24 @@ public class FileGenerator {
             while (FileUtils.sizeOf(file) < size) {
                 writer.write(generateRandomStringOfSize(99));
                 writer.write("\n");
+                writer.write(generateRandomStringOfSize(99));
+                writer.write("\n");
+                writer.write(generateRandomStringOfSize(99));
+                writer.write("\n");
+                writer.write(generateRandomStringOfSize(99));
+                writer.write("\n");
+                writer.write(generateRandomStringOfSize(99));
+                writer.write("\n");
+                writer.write(generateRandomStringOfSize(99));
+                writer.write("\n");
+                writer.write(generateRandomStringOfSize(99));
+                writer.write("\n");
+                writer.write(generateRandomStringOfSize(99));
+                writer.write("\n");
+                writer.write(generateRandomStringOfSize(99));
+                writer.write("\n");
+                writer.write(generateRandomStringOfSize(99));
+                writer.write("\n");
             }
 
             writer.close();
