@@ -1,5 +1,10 @@
 package core;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,18 +17,22 @@ public class WinningBlockChooser extends Thread {
     @Override
     public void run() {
         try {
-            Map<Integer, ProverNodeInformation> copy = VerifierNode.getCurrentBlockchainParticipants();
+            Map<Integer, ProverNodeInformation> copy = VerifierServer.getCurrentBlockchainParticipants();
 
             System.out.println("Losowanie o " + LocalTime.now().withNano(0).toString());
             if (copy.size() > 0) {
                 System.out.println("Wybieranie zwycięskiego węzła spośród kandydatów: ");
                 printNodesChances(copy);
 
-                int winningPort = drawWinningTicket(createDrawingPool(copy));
-                System.out.println("Zwycieski port: " + winningPort);
+                int winningPort = chooseWinner(copy);
 
-                VerifierNode.addToBlockchain(copy.get(winningPort).getProposedBlock());
-                VerifierNode.clearBlockchainParticipants();
+                if (winningPort != -1) {
+                    System.out.println("Zwycieski port: " + winningPort);
+                    VerifierServer.addToBlockchain(copy.get(winningPort).getProposedBlock());
+
+                }
+
+                VerifierServer.clearBlockchainParticipants();
             } else {
                 System.out.println("Żaden węzeł nie zgłosił propozycji nowego bloku");
             }
@@ -33,6 +42,24 @@ public class WinningBlockChooser extends Thread {
             System.err.println("Błąd podczas wybierania zwycięskiego węzła");
             System.err.println(e.getMessage());
         }
+    }
+
+    private int chooseWinner(Map<Integer, ProverNodeInformation> participants) {
+        int portOfWinner = -1;
+        boolean winnerChose = false;
+
+        while (!participants.isEmpty() && !winnerChose) {
+            int candidate = drawWinningTicket(createDrawingPool(participants));
+
+            if (checkProofOfSpace(participants.get(candidate))) {
+                portOfWinner = candidate;
+                winnerChose = true;
+            } else {
+                participants.remove(candidate);
+            }
+        }
+
+        return portOfWinner;
     }
 
     Map<Integer, Double> calculateProversChancesToAddABlock(Map<Integer, ProverNodeInformation> participants) {
@@ -64,5 +91,40 @@ public class WinningBlockChooser extends Thread {
     private void printNodesChances(Map<Integer, ProverNodeInformation> participants) {
         Map<Integer, Double> chances = calculateProversChancesToAddABlock(participants);
         chances.forEach((port, chance) -> System.out.println(port + " -> " + String.format("%.2f", chance)));
+    }
+
+    private boolean checkProofOfSpace(ProverNodeInformation winner) {
+        boolean validProofOfSpace = false;
+
+        try {
+            Socket socket = new Socket("127.0.0.1", winner.getSocket().getPort());
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            out.println(MessageCode.VERIFIER_CHECK_IS_FILE_STORED.name());
+            out.println(winner.getFileLineNumber());
+
+            String line = in.readLine();
+            String hash = in.readLine();
+
+            validProofOfSpace = isReceivedFileLineEqualStoredLine(line, winner.getFileLine()) &&
+                    isReceivedHashOfFileEqualStoredHas(hash, winner.getFileHash());
+
+            in.close();
+            out.close();
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return validProofOfSpace;
+    }
+
+    private boolean isReceivedFileLineEqualStoredLine(String received, String stored) {
+        return stored.equals(received);
+    }
+
+    private boolean isReceivedHashOfFileEqualStoredHas(String received, String stored) {
+        return stored.equals(received);
     }
 }

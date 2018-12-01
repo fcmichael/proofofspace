@@ -24,10 +24,14 @@ public class ProverNode {
     private static PrintWriter out;
     private static BufferedReader in;
 
+    private static ProverServer proverServer;
+
     public static void main(String[] args) {
         startConnectionWithVerifierNode();
         downloadCurrentBlockchain();
+        initVerifierRequestsProcessor();
         askUserForRequests();
+        stopVerifierRequestsProcessor();
         stopConnectionWithVerifierNode();
     }
 
@@ -41,6 +45,15 @@ public class ProverNode {
             log.error("Error while initializing prover node and connection with verifier node");
             log.error(e.getMessage());
         }
+    }
+
+    private static void initVerifierRequestsProcessor() {
+        proverServer = new ProverServer(socket.getLocalPort());
+        new Thread(proverServer).start();
+    }
+
+    private static void stopVerifierRequestsProcessor() {
+        proverServer.stop();
     }
 
     private static void downloadCurrentBlockchain() {
@@ -95,7 +108,7 @@ public class ProverNode {
     }
 
     private static String buildFilePath() {
-        return "files/" + socket.getPort() + LocalDateTime.now() + ".txt";
+        return "files/" + socket.getLocalPort() + ".pospace.txt";
     }
 
     private static void receiveAndStoreFileForProofOfSpace() {

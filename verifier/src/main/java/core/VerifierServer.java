@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 @Slf4j
-public class VerifierNode {
+public class VerifierServer {
 
     private static final int SERVER_SOCKET_PORT = 2222;
     private static final Blockchain blockchain = new Blockchain();

@@ -53,7 +53,7 @@ class ProverRequestsProcessor extends Thread {
     }
 
     private void processSendingBlockchain() {
-        out.println(Blockchain.toJSON(VerifierNode.getBlockchain()));
+        out.println(Blockchain.toJSON(VerifierServer.getBlockchain()));
     }
 
     private void processReceivingNewBlock() {
@@ -64,7 +64,7 @@ class ProverRequestsProcessor extends Thread {
             Block block = Block.fromJSON(in.readLine());
             long randomLineNumber = generateRandomFileLine(FileService.countFileLines(generatedFile.getPath()));
             String fileLine = FileService.getSpecificFileLine(generatedFile.getPath(), randomLineNumber);
-            VerifierNode.addProverToBlockchainParticipants(prover.getPort(), new ProverNodeInformation(prover, fileHash, randomLineNumber, fileLine, fileSize, block));
+            VerifierServer.addProverToBlockchainParticipants(prover.getPort(), new ProverNodeInformation(prover, fileHash, randomLineNumber, fileLine, fileSize, block));
             sendFileToProver(generatedFile);
         } catch (IOException e) {
             e.printStackTrace();
