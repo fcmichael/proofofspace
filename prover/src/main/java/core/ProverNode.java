@@ -7,10 +7,11 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.net.Socket;
-import java.time.LocalDateTime;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import static core.ConsoleCode.FINISH;
+import static core.ConsoleCode.UNKNOWN;
 
 @Slf4j
 public class ProverNode {
@@ -66,39 +67,48 @@ public class ProverNode {
     }
 
     private static void askUserForRequests() {
-        printMenu();
-
         try (Scanner scanner = new Scanner(System.in)) {
-            ConsoleCode task;
-            while ((task = ConsoleCode.fromId(scanner.nextInt())) != FINISH) {
-                switch (task) {
-                    case PRINT_BLOCKCHAIN:
-                        downloadCurrentBlockchain();
-                        blockchain.print();
-                        break;
-                    case ADD_NEW_BLOCK:
-                        downloadCurrentBlockchain();
-                        processAddingNewBlock(scanner);
-                        break;
+            ConsoleCode task = UNKNOWN;
+            while (task != FINISH) {
+                try {
+                    printMenu();
+                    task = ConsoleCode.fromId(scanner.nextInt());
+                    switch (task) {
+                        case PRINT_BLOCKCHAIN:
+                            downloadCurrentBlockchain();
+                            blockchain.print();
+                            break;
+                        case ADD_NEW_BLOCK:
+                            downloadCurrentBlockchain();
+                            processAddingNewBlock(scanner);
+                            break;
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Błędne dane. Podaj poprawną komendę z listy.");
+                    scanner.next();
                 }
-                printMenu();
             }
         }
     }
 
     private static void processAddingNewBlock(Scanner scanner) {
-        System.out.println("Podaj ciag znakow, ktory zostanie dodany do lancucha:");
-        String blockData = scanner.next();
-        System.out.println("Podaj rozmiar pliku na potrzeby realizacji konsensusu Proof of Space [MB]:");
-        int fileSize = scanner.nextInt();
+        try {
+            System.out.println("Podaj ciag znakow, ktory zostanie dodany do lancucha:");
+            String blockData = scanner.next();
+            System.out.println("Podaj rozmiar pliku na potrzeby realizacji konsensusu Proof of Space [MB]:");
+            int fileSize = scanner.nextInt();
 
-        Block block = createBlock(blockData);
+            Block block = createBlock(blockData);
 
-        out.println(MessageCode.PROVER_SENDING_NEW_BLOCK.name());
-        out.println(fileSize);
-        out.println(Block.toJSON(block));
+            out.println(MessageCode.PROVER_SENDING_NEW_BLOCK.name());
+            out.println(fileSize);
+            out.println(Block.toJSON(block));
 
-        receiveAndStoreFileForProofOfSpace();
+            receiveAndStoreFileForProofOfSpace();
+        } catch (InputMismatchException e) {
+            System.out.println("Podano nieprawidłowy rozmiar pliku");
+            scanner.next();
+        }
     }
 
     private static Block createBlock(String data) {
@@ -135,7 +145,7 @@ public class ProverNode {
         System.out.println("(0) - zakoncz");
         System.out.println("(1) - wyswietl blockchain");
         System.out.println("(2) - dodaj nowy blok");
-        System.out.print("Podaj komende:");
+        System.out.print("Wybierz polecenie:");
     }
 
     private static void stopConnectionWithVerifierNode() {
