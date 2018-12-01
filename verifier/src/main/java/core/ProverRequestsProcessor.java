@@ -82,7 +82,6 @@ class ProverRequestsProcessor extends Thread {
             fr.close();
             out.println(MessageCode.END_OF_FILE);
             FileUtils.deleteQuietly(file);
-            System.out.println("Wyslano plik");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -106,7 +105,6 @@ class ProverRequestsProcessor extends Thread {
             out.close();
             prover.close();
         } catch (IOException e) {
-            log.error("Error while stopping connection with prover");
             log.error(e.getMessage());
         }
     }

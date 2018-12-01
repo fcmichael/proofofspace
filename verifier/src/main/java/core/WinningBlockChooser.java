@@ -14,6 +14,9 @@ import java.util.stream.Collectors;
 
 public class WinningBlockChooser extends Thread {
 
+    private final String PROVER_HOST = "127.0.0.1";
+    private final int NONE_PROVER_PASSED_PROOF_OF_SPACE_VERIFICATION = -1;
+
     @Override
     public void run() {
         try {
@@ -26,10 +29,9 @@ public class WinningBlockChooser extends Thread {
 
                 int winningPort = chooseWinner(copy);
 
-                if (winningPort != -1) {
+                if (winningPort != NONE_PROVER_PASSED_PROOF_OF_SPACE_VERIFICATION) {
                     System.out.println("Zwycieski port: " + winningPort);
                     VerifierServer.addToBlockchain(copy.get(winningPort).getProposedBlock());
-
                 }
 
                 VerifierServer.clearBlockchainParticipants();
@@ -45,7 +47,7 @@ public class WinningBlockChooser extends Thread {
     }
 
     private int chooseWinner(Map<Integer, ProverNodeInformation> participants) {
-        int portOfWinner = -1;
+        int portOfWinner = NONE_PROVER_PASSED_PROOF_OF_SPACE_VERIFICATION;
         boolean winnerChose = false;
 
         while (!participants.isEmpty() && !winnerChose) {
@@ -97,7 +99,7 @@ public class WinningBlockChooser extends Thread {
         boolean validProofOfSpace = false;
 
         try {
-            Socket socket = new Socket("127.0.0.1", winner.getSocket().getPort());
+            Socket socket = new Socket(PROVER_HOST, winner.getSocket().getPort());
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 

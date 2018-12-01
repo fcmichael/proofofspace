@@ -16,6 +16,8 @@ import static core.ConsoleCode.UNKNOWN;
 @Slf4j
 public class ProverNode {
 
+    private static String proofOfSpaceFilePath;
+
     private static Blockchain blockchain;
 
     private static final String VERIFIER_NODE_HOST = "127.0.0.1";
@@ -41,15 +43,15 @@ public class ProverNode {
             socket = new Socket(VERIFIER_NODE_HOST, VERIFIER_NODE_PORT);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            proofOfSpaceFilePath = "files/" + socket.getLocalPort() + ".pospace.txt";
             System.out.println("Zainicjalizowano węzeł dowodzący na porcie: " + socket.getLocalPort());
         } catch (Exception e) {
-            log.error("Error while initializing prover node and connection with verifier node");
             log.error(e.getMessage());
         }
     }
 
     private static void initVerifierRequestsProcessor() {
-        proverServer = new ProverServer(socket.getLocalPort());
+        proverServer = new ProverServer(socket.getLocalPort(), proofOfSpaceFilePath);
         new Thread(proverServer).start();
     }
 
@@ -117,12 +119,8 @@ public class ProverNode {
                 String.valueOf(socket.getLocalPort()), data);
     }
 
-    private static String buildFilePath() {
-        return "files/" + socket.getLocalPort() + ".pospace.txt";
-    }
-
     private static void receiveAndStoreFileForProofOfSpace() {
-        File file = new File(buildFilePath());
+        File file = new File(proofOfSpaceFilePath);
 
         try {
             FileUtils.touch(file);
@@ -135,7 +133,6 @@ public class ProverNode {
             }
 
             fw.close();
-            System.out.println("zapisano plik");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -154,7 +151,6 @@ public class ProverNode {
             out.close();
             socket.close();
         } catch (IOException e) {
-            log.error("Error while stopping connection with verifier node");
             log.error(e.getMessage());
         }
     }

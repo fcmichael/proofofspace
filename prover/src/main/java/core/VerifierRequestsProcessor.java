@@ -10,14 +10,14 @@ import java.net.Socket;
 
 public class VerifierRequestsProcessor extends Thread {
 
+    private String proofOfSpaceFilePath;
     private Socket clientSocket;
-    private int proverPort;
     private PrintWriter out;
     private BufferedReader in;
 
-    VerifierRequestsProcessor(Socket clientSocket, int proverPort) {
+    VerifierRequestsProcessor(Socket clientSocket, String proofOfSpaceFilePath) {
         this.clientSocket = clientSocket;
-        this.proverPort = proverPort;
+        this.proofOfSpaceFilePath = proofOfSpaceFilePath;
     }
 
     public void run() {
@@ -38,27 +38,18 @@ public class VerifierRequestsProcessor extends Thread {
     }
 
     private void processRequest(MessageCode messageCode) throws IOException {
-        switch (messageCode) {
-            case VERIFIER_CHECK_IS_FILE_STORED:
-                System.out.println("Otrzymano zadanie weryfikacji pliku");
-                long fileLineToSend = Long.valueOf(in.readLine());
-
-                out.println(getLineFromStoredFile(fileLineToSend));
-
-                out.println(getHashOfStoredFile());
-
-                break;
+        if (messageCode == MessageCode.VERIFIER_CHECK_IS_FILE_STORED) {
+            long fileLineToSend = Long.valueOf(in.readLine());
+            out.println(getLineFromStoredFile(fileLineToSend));
+            out.println(getHashOfStoredFile());
         }
     }
 
-
     private String getLineFromStoredFile(long line) {
-        String path = "files/" + proverPort + ".pospace.txt";
-        return FileService.getSpecificFileLine(path, line);
+        return FileService.getSpecificFileLine(proofOfSpaceFilePath, line);
     }
 
     private String getHashOfStoredFile() {
-        String path = "files/" + proverPort + ".pospace.txt";
-        return FileService.getFileMd5Hash(path);
+        return FileService.getFileMd5Hash(proofOfSpaceFilePath);
     }
 }

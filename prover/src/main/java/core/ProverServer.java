@@ -9,9 +9,11 @@ public class ProverServer implements Runnable {
     private ServerSocket serverSocket;
     private int serverPort;
     private boolean isStopped = false;
+    private String proofOfSpaceFilePath;
 
-    ProverServer(int port) {
+    ProverServer(int port, String proofOfSpaceFilePath) {
         this.serverPort = port;
+        this.proofOfSpaceFilePath = proofOfSpaceFilePath;
     }
 
     @Override
@@ -20,7 +22,7 @@ public class ProverServer implements Runnable {
         while (!isStopped()) {
             try {
                 Socket clientSocket = this.serverSocket.accept();
-                new Thread(new VerifierRequestsProcessor(clientSocket, serverPort)).start();
+                new Thread(new VerifierRequestsProcessor(clientSocket, proofOfSpaceFilePath)).start();
             } catch (IOException e) {
                 if (isStopped()) {
                     System.out.println("Prover Server Stopped.");

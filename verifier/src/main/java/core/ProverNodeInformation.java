@@ -9,7 +9,6 @@ import java.net.Socket;
 @Getter
 @AllArgsConstructor
 class ProverNodeInformation {
-
     private final Socket socket;
     private final String fileHash;
     private final long fileLineNumber;

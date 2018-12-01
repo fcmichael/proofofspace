@@ -9,7 +9,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class VerifierServer {
@@ -28,7 +31,7 @@ public class VerifierServer {
 
     static void addToBlockchain(Block block) {
         if (blockchain.addBlock(block)) {
-            System.out.println("Poprawnie dodano nowy blok do lancucha");
+            System.out.println("Poprawnie dodano nowy blok do łancucha");
         } else {
             System.out.println("Niepoprawny blok, nie dodano");
         }
@@ -55,7 +58,6 @@ public class VerifierServer {
             serverSocket = new ServerSocket(SERVER_SOCKET_PORT);
             proversTakingPartInBlockCreation = new ConcurrentHashMap<>();
         } catch (IOException e) {
-            log.error("Error while initializing server socket");
             log.error(e.getMessage());
         }
     }
@@ -67,7 +69,6 @@ public class VerifierServer {
                 new ProverRequestsProcessor(prover).start();
             }
         } catch (IOException e) {
-            log.error("Error while accepting client request");
             log.error(e.getMessage());
         }
     }
