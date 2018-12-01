@@ -47,6 +47,16 @@ public class FileServiceTest {
         Assert.assertEquals("CCC", FileService.getSpecificFileLine(filePath, 3));
     }
 
+    @Test
+    public void should_return_empty_string_when_asking_of_specific_line_of_not_existing_file() {
+        Assert.assertEquals("", FileService.getSpecificFileLine("aa", 1));
+    }
+
+    @Test
+    public void should_return_empty_string_when_asking_of_hash_of_not_existing_file() {
+        Assert.assertEquals("", FileService.getFileMd5Hash("aa"));
+    }
+
     @After
     public void remove_created_file_if_exists() {
         FileUtils.deleteQuietly(new File(filePath));
