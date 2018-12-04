@@ -32,6 +32,8 @@ public class WinningBlockChooser extends Thread {
                 if (winningPort != NONE_PROVER_PASSED_PROOF_OF_SPACE_VERIFICATION) {
                     System.out.println("Zwycieski port: " + winningPort);
                     VerifierServer.addToBlockchain(copy.get(winningPort).getProposedBlock());
+                } else {
+                    System.out.println("Żaden z kandydatów nie przeszedł weryfikacji Proof of Space");
                 }
 
                 VerifierServer.clearBlockchainParticipants();
@@ -52,7 +54,10 @@ public class WinningBlockChooser extends Thread {
         while (!participants.isEmpty() && !winnerChose) {
             int candidate = drawWinningTicket(createDrawingPool(participants));
 
+            System.out.println("Wylosowano węzeł: " + candidate);
+
             if (checkProofOfSpace(participants.get(candidate))) {
+                System.out.println("Kandydat pomyślnie przeszedł weryfikację Proof of Space");
                 portOfWinner = candidate;
                 winnerChose = true;
             } else {
@@ -122,10 +127,22 @@ public class WinningBlockChooser extends Thread {
     }
 
     private boolean isReceivedFileLineEqualStoredLine(String received, String stored) {
-        return stored.equals(received);
+        boolean valid = stored.equals(received);
+
+        if (!valid) {
+            System.out.println("Otrzymana linia pliku jest nieprawidłowa");
+        }
+
+        return valid;
     }
 
     private boolean isReceivedHashOfFileEqualStoredHas(String received, String stored) {
-        return stored.equals(received);
+        boolean valid = stored.equals(received);
+
+        if (!valid) {
+            System.out.println("Otrzymany hash pliku jest nieprawidłowy");
+        }
+
+        return valid;
     }
 }

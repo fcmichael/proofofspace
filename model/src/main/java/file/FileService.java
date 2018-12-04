@@ -1,13 +1,11 @@
 package file;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-@Slf4j
 public class FileService {
 
     public static String getFileMd5Hash(String path) {
@@ -20,9 +18,12 @@ public class FileService {
             FileInputStream fis = new FileInputStream(file);
             md5 = DigestUtils.md5Hex(fis);
             fis.close();
+        } catch (FileNotFoundException e) {
+            md5 = "";
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return md5;
     }
 
@@ -31,9 +32,12 @@ public class FileService {
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             for (int i = 1; i < lineNumber; i++) br.readLine();
             line = br.readLine();
+        } catch (FileNotFoundException e) {
+            line = "";
         } catch (IOException e) {
-            log.error(e.getMessage());
+            e.printStackTrace();
         }
+
         return line;
     }
 

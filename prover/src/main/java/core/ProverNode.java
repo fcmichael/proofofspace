@@ -2,7 +2,6 @@ package core;
 
 import blockchain.Block;
 import blockchain.Blockchain;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;

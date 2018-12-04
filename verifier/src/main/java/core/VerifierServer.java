@@ -20,7 +20,7 @@ public class VerifierServer {
     private static final Blockchain blockchain = new Blockchain();
     private static ServerSocket serverSocket;
     private static Map<Integer, ProverNodeInformation> proversTakingPartInBlockCreation;
-    private static final int CHOOSING_WINNING_BLOCK_PERIOD_SECONDS = 15;
+    private static final int CHOOSING_WINNING_BLOCK_PERIOD_SECONDS = 45;
 
     public static void main(String[] args) {
         init();
