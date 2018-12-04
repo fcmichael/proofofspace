@@ -2,11 +2,11 @@ package core;
 
 import blockchain.Block;
 import blockchain.Blockchain;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLOutput;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,7 +14,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
 public class VerifierServer {
 
     private static final int SERVER_SOCKET_PORT = 2222;
@@ -57,8 +56,9 @@ public class VerifierServer {
         try {
             serverSocket = new ServerSocket(SERVER_SOCKET_PORT);
             proversTakingPartInBlockCreation = new ConcurrentHashMap<>();
+            System.out.println("Zainicjalizowano serwer weryfikujący na porcie: " + SERVER_SOCKET_PORT);
         } catch (IOException e) {
-            log.error(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -69,7 +69,7 @@ public class VerifierServer {
                 new ProverRequestsProcessor(prover).start();
             }
         } catch (IOException e) {
-            log.error(e.getMessage());
+            e.printStackTrace();
         }
     }
 

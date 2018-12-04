@@ -21,8 +21,7 @@ public class FileService {
             md5 = DigestUtils.md5Hex(fis);
             fis.close();
         } catch (IOException e) {
-            log.error("Błąd podczas generowania skrótu md5 dla pliku o ścieżce: " + file.getPath());
-            log.error(e.getMessage());
+            e.printStackTrace();
         }
         return md5;
     }

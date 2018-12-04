@@ -41,8 +41,7 @@ public class WinningBlockChooser extends Thread {
 
             System.out.println("-------------------------");
         } catch (Exception e) {
-            System.err.println("Błąd podczas wybierania zwycięskiego węzła");
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 

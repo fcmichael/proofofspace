@@ -43,8 +43,7 @@ public class FileGenerator {
 
             writer.close();
         } catch (IOException e) {
-            log.error("Błąd podczas generowania pliku o rozmiarze = " + sizeMBs + " MBs");
-            log.error(e.getMessage());
+            e.printStackTrace();
         }
 
         return file;

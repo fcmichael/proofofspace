@@ -25,14 +25,11 @@ public class ProverServer implements Runnable {
                 new Thread(new VerifierRequestsProcessor(clientSocket, proofOfSpaceFilePath)).start();
             } catch (IOException e) {
                 if (isStopped()) {
-                    System.out.println("Prover Server Stopped.");
                     return;
                 }
-                throw new RuntimeException("Error accepting client connection", e);
+                e.printStackTrace();
             }
         }
-
-        System.out.println("Prover Server Stopped.");
     }
 
 
@@ -45,17 +42,15 @@ public class ProverServer implements Runnable {
         try {
             this.serverSocket.close();
         } catch (IOException e) {
-            throw new RuntimeException("Error closing server", e);
+            e.printStackTrace();
         }
     }
 
     private void openServerSocket() {
         try {
             this.serverSocket = new ServerSocket(this.serverPort);
-            System.out.println("Initialized prover server on port " + serverPort);
         } catch (IOException e) {
-            System.err.println("Cannot open prover server on port " + serverPort);
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 

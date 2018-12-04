@@ -13,7 +13,6 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.concurrent.ThreadLocalRandom;
 
-@Slf4j
 class ProverRequestsProcessor extends Thread {
     private Socket prover;
     private BufferedReader in;
@@ -105,7 +104,7 @@ class ProverRequestsProcessor extends Thread {
             out.close();
             prover.close();
         } catch (IOException e) {
-            log.error(e.getMessage());
+            e.printStackTrace();
         }
     }
 }

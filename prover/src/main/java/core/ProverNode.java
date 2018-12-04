@@ -13,7 +13,6 @@ import java.util.Scanner;
 import static core.ConsoleCode.FINISH;
 import static core.ConsoleCode.UNKNOWN;
 
-@Slf4j
 public class ProverNode {
 
     private static String proofOfSpaceFilePath;
@@ -46,7 +45,7 @@ public class ProverNode {
             proofOfSpaceFilePath = "files/" + socket.getLocalPort() + ".pospace.txt";
             System.out.println("Zainicjalizowano węzeł dowodzący na porcie: " + socket.getLocalPort());
         } catch (Exception e) {
-            log.error(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -151,7 +150,7 @@ public class ProverNode {
             out.close();
             socket.close();
         } catch (IOException e) {
-            log.error(e.getMessage());
+            e.printStackTrace();
         }
     }
 }
