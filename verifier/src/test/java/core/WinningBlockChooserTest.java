@@ -11,9 +11,9 @@ public class WinningBlockChooserTest {
 
     @Test
     public void should_count_blocks_chances_to_add_a_block() {
-        ProverNodeInformation p1 = new ProverNodeInformation(null, null, 0, null, 2, null);
-        ProverNodeInformation p2 = new ProverNodeInformation(null, null, 0, null, 3, null);
-        ProverNodeInformation p3 = new ProverNodeInformation(null, null, 0, null, 5, null);
+        ProverNodeInformation p1 = new ProverNodeInformation(null, 0, null, 0, null, 2, null);
+        ProverNodeInformation p2 = new ProverNodeInformation(null, 0, null, 0, null, 3, null);
+        ProverNodeInformation p3 = new ProverNodeInformation(null, 0, null, 0, null, 5, null);
         Map<Integer, ProverNodeInformation> participants = new HashMap<>();
 
         participants.put(1, p1);
@@ -31,9 +31,9 @@ public class WinningBlockChooserTest {
 
     @Test
     public void should_create_drawing_pool() {
-        ProverNodeInformation p1 = new ProverNodeInformation(null, null, 0, null, 2, null);
-        ProverNodeInformation p2 = new ProverNodeInformation(null, null, 0, null, 3, null);
-        ProverNodeInformation p3 = new ProverNodeInformation(null, null, 0, null, 5, null);
+        ProverNodeInformation p1 = new ProverNodeInformation(null, 0, null, 0, null, 2, null);
+        ProverNodeInformation p2 = new ProverNodeInformation(null, 0, null, 0, null, 3, null);
+        ProverNodeInformation p3 = new ProverNodeInformation(null, 0, null, 0, null, 5, null);
         Map<Integer, ProverNodeInformation> participants = new HashMap<>();
 
         participants.put(1, p1);

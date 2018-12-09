@@ -49,8 +49,9 @@ public class ProverNode {
     }
 
     private static void initVerifierRequestsProcessor() {
-        proverServer = new ProverServer(socket.getLocalPort(), proofOfSpaceFilePath);
+        proverServer = new ProverServer(proofOfSpaceFilePath);
         new Thread(proverServer).start();
+        sendServerPortNumber();
     }
 
     private static void stopVerifierRequestsProcessor() {
@@ -64,6 +65,11 @@ public class ProverNode {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void sendServerPortNumber() {
+        out.println(MessageCode.PROVER_SENDING_SERVER_PORT_NUMBER.name());
+        out.println(proverServer.getLocalPort());
     }
 
     private static void askUserForRequests() {

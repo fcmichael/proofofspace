@@ -103,7 +103,7 @@ public class WinningBlockChooser extends Thread {
         boolean validProofOfSpace = false;
 
         try {
-            Socket socket = new Socket(PROVER_HOST, winner.getSocket().getPort());
+            Socket socket = new Socket(PROVER_HOST, winner.getServerPort());
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 

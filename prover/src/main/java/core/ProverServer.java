@@ -7,18 +7,16 @@ import java.net.Socket;
 public class ProverServer implements Runnable {
 
     private ServerSocket serverSocket;
-    private int serverPort;
     private boolean isStopped = false;
     private String proofOfSpaceFilePath;
 
-    ProverServer(int port, String proofOfSpaceFilePath) {
-        this.serverPort = port;
+    ProverServer(String proofOfSpaceFilePath) {
         this.proofOfSpaceFilePath = proofOfSpaceFilePath;
+        openServerSocket();
     }
 
     @Override
     public void run() {
-        openServerSocket();
         while (!isStopped()) {
             try {
                 Socket clientSocket = this.serverSocket.accept();
@@ -32,6 +30,9 @@ public class ProverServer implements Runnable {
         }
     }
 
+    int getLocalPort() {
+        return serverSocket.getLocalPort();
+    }
 
     private synchronized boolean isStopped() {
         return this.isStopped;
@@ -48,7 +49,8 @@ public class ProverServer implements Runnable {
 
     private void openServerSocket() {
         try {
-            this.serverSocket = new ServerSocket(this.serverPort);
+            this.serverSocket = new ServerSocket(0);
+            System.out.println("Zainicjalizowano server na porcie: " + this.serverSocket.getLocalPort());
         } catch (IOException e) {
             e.printStackTrace();
         }

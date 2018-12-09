@@ -16,6 +16,7 @@ class ProverRequestsProcessor extends Thread {
     private Socket prover;
     private BufferedReader in;
     private PrintWriter out;
+    private int serverPort;
 
     ProverRequestsProcessor(Socket prover) {
         this.prover = prover;
@@ -47,6 +48,8 @@ class ProverRequestsProcessor extends Thread {
             case PROVER_SENDING_NEW_BLOCK:
                 processReceivingNewBlock();
                 break;
+            case PROVER_SENDING_SERVER_PORT_NUMBER:
+                processReceivingServerPort();
         }
     }
 
@@ -62,8 +65,16 @@ class ProverRequestsProcessor extends Thread {
             Block block = Block.fromJSON(in.readLine());
             long randomLineNumber = generateRandomFileLine(FileService.countFileLines(generatedFile.getPath()));
             String fileLine = FileService.getSpecificFileLine(generatedFile.getPath(), randomLineNumber);
-            VerifierServer.addProverToBlockchainParticipants(prover.getPort(), new ProverNodeInformation(prover, fileHash, randomLineNumber, fileLine, fileSize, block));
+            VerifierServer.addProverToBlockchainParticipants(prover.getPort(), new ProverNodeInformation(prover, serverPort, fileHash, randomLineNumber, fileLine, fileSize, block));
             sendFileToProver(generatedFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void processReceivingServerPort() {
+        try {
+            this.serverPort = Integer.valueOf(in.readLine());
         } catch (IOException e) {
             e.printStackTrace();
         }
